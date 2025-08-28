@@ -1,0 +1,127 @@
+/* فونت محلی Attiq - مسیر را بر اساس ساختار پوشه تنظیم کن */
+@font-face {
+  font-family: 'Attiq';
+  src: url('./assets/fonts/Attiq.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* رنگ‌ها */
+:root {
+  --grid-stroke: #a3ae8e;
+  --text: #803214;
+  --overlay-bg: rgba(255,255,255,0.92);
+}
+
+/* پایه */
+* { box-sizing: border-box; }
+html,body { height:100%; margin:0; padding:0; font-family: 'Attiq', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#000; color:var(--text); }
+
+/* بالای صفحه (اطلاعات) */
+#top-info { position: absolute; top:6px; left:6px; right:6px; text-align:center; font-size:13px; color:rgba(128,50,20,0.9); z-index: 20; }
+
+/* UI کلی روی ویدئو دوربین */
+#ui {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  pointer-events:none;
+  z-index: 10;
+}
+
+/* Start screen */
+#start-screen {
+  margin-top: 8vh;
+  width: min(520px, 92%);
+  background: rgba(255,255,255,0.88);
+  padding: 18px;
+  border-radius: 12px;
+  text-align:center;
+  pointer-events:auto;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+#start-screen h1 { margin:6px 0 8px; color:var(--text); }
+.controls-row { display:flex; gap:10px; justify-content:center; margin-top:10px; }
+button { cursor:pointer; font-family: inherit; }
+
+button#start-btn, button#force-show-btn, #restart-btn, #overlay-action {
+  pointer-events:auto;
+  border: 2px solid var(--grid-stroke);
+  background: white;
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+/* دیو بازی دوز */
+#game-wrapper {
+  margin-top: 6vh;
+  width: min(520px, 92%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  pointer-events:auto;
+}
+
+/* هدر بازی */
+#game-header { text-align:center; margin-bottom:10px; }
+
+/* گرید دوز */
+#game-board {
+  display:grid;
+  grid-template-columns: repeat(3, min(22vw,110px));
+  gap: min(1.8vw,8px);
+  pointer-events:auto;
+}
+
+/* هر خانه */
+.cell {
+  border: 3px solid var(--grid-stroke);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: clamp(28px, 7vw, 44px);
+  line-height:1;
+  user-select:none;
+  background: transparent;
+  transition: transform .06s ease;
+  touch-action: manipulation;
+  aspect-ratio: 1 / 1; /* مرورگرهای جدید */
+}
+.cell:active { transform: scale(0.98); }
+.cell.disabled { pointer-events:none; opacity:0.6; }
+
+/* اورلی مرکز */
+#center-overlay {
+  position: absolute;
+  inset: 0;
+  display:grid;
+  place-items:center;
+  background: rgba(0,0,0,0.45);
+  z-index: 50;
+  pointer-events:auto;
+}
+#center-overlay > div {
+  background: var(--overlay-bg);
+  padding: 16px;
+  border-radius: 12px;
+  text-align:center;
+  color: var(--text);
+  min-width: 200px;
+}
+
+/* پیام وضعیت پایین */
+#status-msg { position:absolute; bottom:10px; font-size:13px; color: #fff; background: rgba(0,0,0,0.45); padding:6px 10px; border-radius:8px; z-index:30; }
+
+/* کلاس‌های کمکی */
+.hidden { display:none !important; }
+.status-hidden { display:none; }
+
+/* پاسخ‌گوی موبایل */
+@media (max-width:420px) {
+  #start-screen, #game-wrapper { width: 94%; margin-top:5vh; }
+  .controls-row { flex-direction: column; }
+}
