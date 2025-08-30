@@ -1,42 +1,74 @@
-<!doctype html>
-<html lang="fa">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AR Tic-Tac-Toe (بازی دوز واقعیت افزوده)</title>
-<link rel="stylesheet" href="style.css">
-<script defer src="app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>رشد سبز — AR Tic-Tac-Toe</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- A-Frame + MindAR (Image Tracking) -->
+  <!-- اگر CDN دسترسی نداره، می‌تونی این اسکریپت‌ها رو لوکال بیاری -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
-<!-- camera feed (behind everything) -->
-<video id="camera" autoplay playsinline></video>
 
+  <!-- عنوان بالای صفحه -->
+  <header id="app-header">
+    <h1>رشد سبز</h1>
+  </header>
 
-<!-- overlay where game draws (transparent background) -->
-<div id="ui-root">
-<canvas id="ar-canvas" width="600" height="600"></canvas>
+  <!-- صحنه AR: دوربین همیشه باز، تا شناسایی انجام شه -->
+  <a-scene
+    mindar-image="imageTargetSrc: ./assets/target.mind; filterMinCF:0.0001; filterBeta: 0.001;"
+    color-space="sRGB"
+    embedded
+    renderer="precision: medium; antialias: true; alpha: true; physicallyCorrectLights: false"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true"
+  >
+    <!-- دوربین -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+    <!-- تارگت: فقط برای شنیدن رویدادهای targetFound/targetLost استفاده می‌کنیم -->
+    <a-entity id="marker" mindar-image-target="targetIndex: 0"></a-entity>
+  </a-scene>
 
-<!-- Pot image centered under/over the board (we place it inside overlay so it floats) -->
-<img id="pot-image" src="assets/images/pot1.png" alt="pot" />
+  <!-- UI بازی (روی ویدیو/دوربین سوار می‌شود) -->
+  <main id="ui-root" class="hidden" aria-hidden="true">
+    <section id="game-card" role="region" aria-label="بازی دوز">
+      <!-- وضعیت گل -->
+      <div id="plant-wrap" aria-live="polite">
+        <img id="plant" src="./assets/image/pot1.png" alt="رشد گل بابونه" />
+        <div id="stage-label">مرحله ۱ / ۴</div>
+      </div>
 
+      <!-- خود بازی: وسط صفحه، بک‌گراند شفاف -->
+      <div id="board" role="grid" aria-label="صفحه دوز">
+        <!-- 9 خانه؛ با JS پر می‌شود -->
+      </div>
 
-<!-- Title top -->
-<div id="title">رشد سبز</div>
+      <!-- پیام‌ها -->
+      <div id="message" role="status" aria-live="polite"></div>
 
+      <!-- دکمه شروع دوباره (پایین بازی، کوچکتر از صفحه بازی) -->
+      <div id="controls">
+        <button id="reset-btn" type="button" aria-label="شروع دوباره">شروع دوباره</button>
+      </div>
+    </section>
+  </main>
 
-<!-- Center message (congrats / lost etc.) -->
-<div id="center-msg" aria-live="polite"></div>
+  <!-- مودال تبریک و رفتن به مرحله بعد -->
+  <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <h2 id="modal-title">تبریک!</h2>
+      <p id="modal-text">مرحله بعد آماده‌ست.</p>
+      <button id="modal-next">باشه</button>
+    </div>
+  </div>
 
-
-<!-- Bottom controls -->
-<div id="controls">
-<button id="restart-btn">شروع دوباره</button>
-</div>
-</div>
-
-
-<!-- hidden canvas used for detection computation -->
-<canvas id="detector" width="300" height="300" style="display:none"></canvas>
+  <script src="./app.js"></script>
 </body>
 </html>
