@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-camera></a-camera>
+      <a-box position="0 0 -3" color="tomato"></a-box>
+    </a-scene>
+  </body>
+</html>
