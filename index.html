@@ -1,88 +1,51 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>رشد سبز — AR TicTacToe</title>
-
-  <!-- A-Frame + MindAR (از CDN) -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-  <link rel="stylesheet" href="style.css" />
-  <!-- script.js با defer لود می‌شود -->
-  <script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی دوز با بابونه</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- کتابخانه واقعیت افزوده -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-image-three.prod.js"></script>
 </head>
 <body>
-
-  <!-- توضیح/هدر کوچک -->
-  <div id="top-info">دوربین را روی تصویر بسته‌بندی بگیر — پس از شناسایی، بازی دوز فعال می‌شود.</div>
-
-  <!-- A-Frame scene با MindAR: مسیر فایل target را اینجا مشخص کنید -->
-  <a-scene
-    id="ar-scene"
-    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true;"
-    embedded
-    color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-  >
-    <a-assets>
-      <!-- چهار مرحله گلدون (به صورت png با پس‌زمینه شفاف) -->
-      <img id="pot1" src="./assets/images/pot1.png" />
-      <img id="pot2" src="./assets/images/pot2.png" />
-      <img id="pot3" src="./assets/images/pot3.png" />
-      <img id="pot4" src="./assets/images/pot4.png" />
-    </a-assets>
-
-    <a-camera position="0 0 0"></a-camera>
-
-    <!-- تارگت: targetIndex:0 -->
-    <a-entity mindar-image-target="targetIndex: 0" id="pkgTarget">
-      <!-- گلدان در اطراف بسته‌بندی؛ در ابتدا پنهان است -->
-      <a-image id="ar-plant" src="#pot1" position="0.6 0 0" width="0.8" height="0.8" visible="false"></a-image>
-    </a-entity>
-
-  </a-scene>
-
-  <!-- UI HTML (روی ویدئو دوربین قرار می‌گیرد) -->
-  <div id="ui">
-    <!-- صفحه شروع (اول فقط این نمایش داده می‌شود) -->
-    <div id="start-screen">
-      <h1 id="title">رشد سبز</h1>
-      <p>برای شروع دکمهٔ زیر را بزن، سپس دوربین را روی بسته‌بندی بگیر.</p>
-      <div class="controls-row">
-        <button id="start-btn">شروع بازی</button>
-        <button id="force-show-btn" title="تست بدون تارگت">نمایش تست (بدون تارگت)</button>
-      </div>
-    </div>
-
-    <!-- container بازی دوز (از ابتدا مخفی) -->
-    <div id="game-wrapper" class="hidden">
-      <div id="game-header">
-        <h2>رشد سبز</h2>
-        <div id="bottom-draw-msg" aria-live="polite"></div>
-      </div>
-
-      <div id="game-board"></div>
-
-      <div id="controls">
-        <button id="restart-btn">شروع دوباره</button>
-      </div>
-    </div>
-
-    <!-- اورلی وسط برای پیام برد/باخت/مرحله بعد -->
-    <div id="center-overlay" class="hidden" role="dialog" aria-modal="true">
-      <div id="overlay-text"></div>
-      <button id="overlay-action"></button>
-    </div>
-
-    <!-- پیام خطا یا اطلاع در پایین -->
-    <div id="status-msg" class="status-hidden"></div>
+  <!-- صفحه خوشامد -->
+  <div id="welcome-screen">
+    <h1>به بازی دوز خوش آمدی 🌸</h1>
+    <button id="startBtn">شروع بازی</button>
   </div>
 
-  <!-- راهنمای کوتاه (پنهان توسط CSS) -->
-  <noscript>لطفاً جاوااسکریپت را فعال کنید.</noscript>
+  <!-- بخش بازی -->
+  <div id="game-container" class="hidden">
+    <!-- فضای AR -->
+    <div id="ar-container">
+      <video id="camera" autoplay muted playsinline></video>
+    </div>
+
+    <!-- تخته بازی -->
+    <div id="board" class="hidden">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+
+    <!-- گل بابونه -->
+    <div id="winnerFlower">
+      <img id="flowerImg" src="images/pot0.png" alt="flower">
+    </div>
+
+    <!-- پیام نهایی -->
+    <div id="finalMessage" class="hidden">
+      <h2>تبرییییک 🎉🌼 گل بابونه‌ات کامل شد!</h2>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
