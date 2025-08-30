@@ -8,10 +8,9 @@
   <!-- Styles -->
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- A-Frame + MindAR (Image Tracking) -->
-  <!-- اگر CDN دسترسی نداره، می‌تونی این اسکریپت‌ها رو لوکال بیاری -->
-<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar-js/dist/mindar-image-aframe.prod.js"></script>
+  <!-- A-Frame + MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
 
@@ -20,45 +19,41 @@
     <h1>رشد سبز</h1>
   </header>
 
-  <!-- صحنه AR: دوربین همیشه باز، تا شناسایی انجام شه -->
+  <!-- صحنه AR -->
   <a-scene
-    mindar-image="imageTargetSrc: assets/target.mind; filterMinCF:0.0001; filterBeta: 0.001;"
+    mindar-image="imageTargetSrc: ./assets/target.mind; autoStart: true; uiScanning: true;"
     color-space="sRGB"
     embedded
-    renderer="precision: medium; antialias: true; alpha: true; physicallyCorrectLights: false"
+    renderer="precision: medium; antialias: true; alpha: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true"
   >
+    <!-- preset دوربین مخصوص MindAR -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- تارگت: فقط برای شنیدن رویدادهای targetFound/targetLost استفاده می‌کنیم -->
+    <!-- تارگت -->
     <a-entity id="marker" mindar-image-target="targetIndex: 0"></a-entity>
   </a-scene>
 
-  <!-- UI بازی (روی ویدیو/دوربین سوار می‌شود) -->
+  <!-- UI بازی -->
   <main id="ui-root" class="hidden" aria-hidden="true">
     <section id="game-card" role="region" aria-label="بازی دوز">
-      <!-- وضعیت گل -->
       <div id="plant-wrap" aria-live="polite">
         <img id="plant" src="./assets/image/pot1.png" alt="رشد گل بابونه" />
         <div id="stage-label">مرحله ۱ / ۴</div>
       </div>
 
-      <!-- خود بازی: وسط صفحه، بک‌گراند شفاف -->
-      <div id="board" role="grid" aria-label="صفحه دوز">
-        <!-- 9 خانه؛ با JS پر می‌شود -->
-      </div>
+      <div id="board" role="grid" aria-label="صفحه دوز"></div>
 
-      <!-- پیام‌ها -->
       <div id="message" role="status" aria-live="polite"></div>
 
-      <!-- دکمه شروع دوباره (پایین بازی، کوچکتر از صفحه بازی) -->
       <div id="controls">
         <button id="reset-btn" type="button" aria-label="شروع دوباره">شروع دوباره</button>
       </div>
     </section>
   </main>
 
-  <!-- مودال تبریک و رفتن به مرحله بعد -->
+  <!-- مودال -->
   <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-content">
       <h2 id="modal-title">تبریک!</h2>
@@ -70,6 +65,3 @@
   <script src="./app.js"></script>
 </body>
 </html>
-
-
-
