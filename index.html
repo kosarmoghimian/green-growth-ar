@@ -1,67 +1,143 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>رشد سبز — AR Tic-Tac-Toe</title>
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="./style.css" />
-
-  <!-- A-Frame + MindAR -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>رشد سبز — AR Tic-Tac-Toe</title>
+<style>
+  body, html { margin:0; padding:0; height:100%; font-family:sans-serif; background:#000; color:#800000; }
+  h1 { text-align:center; color:#800000; margin:10px 0; }
+  #video-bg { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-1; }
+  #game-card { position:fixed; top:80px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; background:rgba(255,255,255,0.1); padding:10px; border-radius:10px; text-align:center; }
+  #plant-wrap img { width:80px; height:auto; margin-bottom:5px; }
+  #board { display:grid; grid-template-columns: repeat(3, 80px); grid-gap:5px; justify-content:center; margin:10px 0; }
+  .cell { width:80px; height:80px; border:2px solid #803214; display:flex; align-items:center; justify-content:center; font-size:2em; color:#800000; cursor:pointer; user-select:none; }
+  #message { min-height:20px; margin:5px 0; }
+  #controls { margin-top:5px; }
+  #controls button { padding:5px 10px; border:none; border-radius:5px; background:#803214; color:#fff; font-size:1em; cursor:pointer; }
+  #modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; }
+  #modal .modal-content { background:#fff; color:#800000; padding:20px; border-radius:10px; text-align:center; }
+  #modal button { margin-top:10px; padding:5px 10px; border:none; border-radius:5px; background:#803214; color:#fff; cursor:pointer; }
+</style>
 </head>
 <body>
 
-  <!-- عنوان بالای صفحه -->
-  <header id="app-header">
-    <h1>رشد سبز</h1>
-  </header>
+<h1>رشد سبز</h1>
 
-  <!-- صحنه AR -->
-  <a-scene
-    mindar-image="imageTargetSrc: ./assets/target.mind; autoStart: true; uiScanning: true;"
-    color-space="sRGB"
-    embedded
-    renderer="precision: medium; antialias: true; alpha: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true"
-  >
-    <!-- preset دوربین مخصوص MindAR -->
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+<!-- ویدیو دوربین -->
+<video id="video-bg" autoplay playsinline muted></video>
 
-    <!-- تارگت -->
-    <a-entity id="marker" mindar-image-target="targetIndex: 0"></a-entity>
-  </a-scene>
-
-  <!-- UI بازی -->
-  <main id="ui-root" class="hidden" aria-hidden="true">
-    <section id="game-card" role="region" aria-label="بازی دوز">
-      <div id="plant-wrap" aria-live="polite">
-        <img id="plant" src="./assets/image/pot1.png" alt="رشد گل بابونه" />
-        <div id="stage-label">مرحله ۱ / ۴</div>
-      </div>
-
-      <div id="board" role="grid" aria-label="صفحه دوز"></div>
-
-      <div id="message" role="status" aria-live="polite"></div>
-
-      <div id="controls">
-        <button id="reset-btn" type="button" aria-label="شروع دوباره">شروع دوباره</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- مودال -->
-  <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-content">
-      <h2 id="modal-title">تبریک!</h2>
-      <p id="modal-text">مرحله بعد آماده‌ست.</p>
-      <button id="modal-next">باشه</button>
-    </div>
+<!-- کارت بازی -->
+<div id="game-card">
+  <div id="plant-wrap">
+    <img id="plant" src="assets/image/pot1.png" alt="رشد گل">
+    <div id="stage-label">مرحله 1 / 4</div>
   </div>
+  <div id="board"></div>
+  <div id="message"></div>
+  <div id="controls">
+    <button id="reset-btn">شروع دوباره</button>
+  </div>
+</div>
 
-  <script src="./app.js"></script>
+<!-- مودال تبریک -->
+<div id="modal">
+  <div class="modal-content">
+    <h2>تبریک!</h2>
+    <p>مرحله بعد آماده‌ست.</p>
+    <button id="modal-next">باشه</button>
+  </div>
+</div>
+
+<script>
+const video = document.getElementById('video-bg');
+const boardEl = document.getElementById('board');
+const messageEl = document.getElementById('message');
+const plantEl = document.getElementById('plant');
+const stageLabel = document.getElementById('stage-label');
+const modal = document.getElementById('modal');
+const modalNext = document.getElementById('modal-next');
+const resetBtn = document.getElementById('reset-btn');
+
+let board = Array(9).fill('');
+let currentStage = 1;
+let player = 'X';
+const plantImages = ['assets/image/pot1.png','assets/image/pot2.png','assets/image/pot3.png','assets/image/pot4.png'];
+
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false})
+    .then(stream => { video.srcObject = stream; })
+    .catch(err => { alert('دوربین فعال نشد: '+err); });
+}
+
+function renderBoard() {
+  boardEl.innerHTML = '';
+  board.forEach((cell,i)=>{
+    const div = document.createElement('div');
+    div.classList.add('cell');
+    div.textContent = cell;
+    div.addEventListener('click',()=>playerMove(i));
+    boardEl.appendChild(div);
+  });
+}
+
+function playerMove(idx){
+  if(board[idx]!=='' || player!=='X') return;
+  board[idx]='X';
+  renderBoard();
+  if(checkWin('X')) return playerWin();
+  if(board.every(c=>c!=='') ) return tie();
+  setTimeout(aiMove,300);
+}
+
+function aiMove(){
+  let empty = board.map((v,i)=>v===''?i:null).filter(v=>v!==null);
+  if(empty.length===0) return;
+  const idx = empty[Math.floor(Math.random()*empty.length)]; // ساده ولی کمی تصادفی
+  board[idx]='O';
+  renderBoard();
+  if(checkWin('O')) return aiWin();
+}
+
+function checkWin(p){
+  const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return wins.some(line=>line.every(i=>board[i]===p));
+}
+
+function playerWin(){
+  messageEl.textContent='تبریک! بردی.';
+  if(currentStage<4){
+    plantEl.src=plantImages[currentStage];
+    currentStage++;
+    stageLabel.textContent=`مرحله ${currentStage} / 4`;
+  } else {
+    modal.style.display='flex';
+  }
+  board.fill('');
+  renderBoard();
+}
+
+function aiWin(){
+  messageEl.textContent='باختی، دوباره امتحان کن.';
+  board.fill('');
+  renderBoard();
+}
+
+function tie(){
+  messageEl.textContent='مساوی شد.';
+}
+
+resetBtn.onclick=()=>{
+  board.fill(''); currentStage=1; plantEl.src=plantImages[0]; stageLabel.textContent='مرحله 1 / 4'; messageEl.textContent=''; renderBoard();
+};
+
+modalNext.onclick=()=>{
+  modal.style.display='none';
+};
+
+startCamera();
+renderBoard();
+</script>
+
 </body>
 </html>
