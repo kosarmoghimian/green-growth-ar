@@ -1,51 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی دوز با بابونه</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- کتابخانه واقعیت افزوده -->
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-image-three.prod.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AR Tic-Tac-Toe (بازی دوز واقعیت افزوده)</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="app.js"></script>
 </head>
 <body>
-  <!-- صفحه خوشامد -->
-  <div id="welcome-screen">
-    <h1>به بازی دوز خوش آمدی 🌸</h1>
-    <button id="startBtn">شروع بازی</button>
-  </div>
+<!-- camera feed (behind everything) -->
+<video id="camera" autoplay playsinline></video>
 
-  <!-- بخش بازی -->
-  <div id="game-container" class="hidden">
-    <!-- فضای AR -->
-    <div id="ar-container">
-      <video id="camera" autoplay muted playsinline></video>
-    </div>
 
-    <!-- تخته بازی -->
-    <div id="board" class="hidden">
-      <div class="cell" data-index="0"></div>
-      <div class="cell" data-index="1"></div>
-      <div class="cell" data-index="2"></div>
-      <div class="cell" data-index="3"></div>
-      <div class="cell" data-index="4"></div>
-      <div class="cell" data-index="5"></div>
-      <div class="cell" data-index="6"></div>
-      <div class="cell" data-index="7"></div>
-      <div class="cell" data-index="8"></div>
-    </div>
+<!-- overlay where game draws (transparent background) -->
+<div id="ui-root">
+<canvas id="ar-canvas" width="600" height="600"></canvas>
 
-    <!-- گل بابونه -->
-    <div id="winnerFlower">
-      <img id="flowerImg" src="images/pot0.png" alt="flower">
-    </div>
 
-    <!-- پیام نهایی -->
-    <div id="finalMessage" class="hidden">
-      <h2>تبرییییک 🎉🌼 گل بابونه‌ات کامل شد!</h2>
-    </div>
-  </div>
+<!-- Pot image centered under/over the board (we place it inside overlay so it floats) -->
+<img id="pot-image" src="assets/images/pot1.png" alt="pot" />
 
-  <script src="script.js"></script>
+
+<!-- Title top -->
+<div id="title">رشد سبز</div>
+
+
+<!-- Center message (congrats / lost etc.) -->
+<div id="center-msg" aria-live="polite"></div>
+
+
+<!-- Bottom controls -->
+<div id="controls">
+<button id="restart-btn">شروع دوباره</button>
+</div>
+</div>
+
+
+<!-- hidden canvas used for detection computation -->
+<canvas id="detector" width="300" height="300" style="display:none"></canvas>
 </body>
 </html>
